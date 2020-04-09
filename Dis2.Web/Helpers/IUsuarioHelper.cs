@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dis2.Web.Helpers
 {
-    interface IUsuarioHelper
+    public interface IUsuarioHelper
     {
         Task<Usuario> GetUsuarioByEmailAsync(string email);
         Task<IdentityResult> AddUsuarioAsync(Usuario usuario, string contrasena);

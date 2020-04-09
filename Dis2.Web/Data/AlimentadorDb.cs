@@ -1,4 +1,5 @@
 ﻿using Dis2.Web.Data.Entities;
+using Dis2.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,92 +9,253 @@ namespace Dis2.Web.Data
 {
     public class AlimentadorDb
     {
-        private readonly DataContext _context;
-        public AlimentadorDb(DataContext context)
+        private readonly DataContext _dataContext;
+        private readonly IUsuarioHelper _usuarioHelper;
+
+        public AlimentadorDb(
+            DataContext context,
+            IUsuarioHelper usuarioHelper)
         {
-            _context = context;
+            _dataContext = context;
+            _usuarioHelper = usuarioHelper;
         }
 
         public async Task AlimentadorAsync()
         {
-            await _context.Database.EnsureCreatedAsync();
+            await _dataContext.Database.EnsureCreatedAsync();
+            await CheckRoles();
+            var administrador = await CheckUsuarioAsync("1721515680", "BRYAN RICARDO", "ARMAS LOYAGA", "0996903086", "EL CONDE", "bral_9210@hotmail.com", "A", "Administrador");
+            var cliente = await CheckUsuarioAsync("1723620348", "ERIKA ANNABELL", "MONTESDEOCA CARGUA", "0996907141", "EL CONDE", "erika_annabell@hotmail.com", "A", "Cliente");
             await CheckTipoTratamientosAsync();
             await CheckActividadsAsync();
             await CheckEjerciciosAsync();
             //await CheckHistoriasAsync();
             await CheckImagensAsync();
-            await CheckPacientesAsync();
+            await CheckPacientesAsync(cliente);
             await CheckSonidosAsync();
-            await CheckTitularsAsync();
+            await CheckTitularsAsync(cliente);
+            await CheckAdministradorsAsync(administrador);
             await CheckTratamientosAsync();
             await CheckVideosAsync();
         }
 
-        private Task CheckVideosAsync()
+        private async Task CheckAdministradorsAsync(Usuario usuario)
         {
-            /*var actividad = _context.actividads.FirstOrDefault();
-            if (!_context.videos.Any())
+            if (!_dataContext.administradors.Any())
             {
-                _context.videos.Add(new Video { Nombre = "LETRAB", VideoUrl = "", Estado = "A",  });
-                _context.videos.Add(new Video { Nombre = "LETRAC", VideoUrl = "", Estado = "A" });
-                await _context.SaveChangesAsync();
-            }*/
-            throw new NotImplementedException();
+                _dataContext.administradors.Add(new Administrador { Usuario = usuario });
+                await _dataContext.SaveChangesAsync();
+            }
         }
 
-        private Task CheckTratamientosAsync()
+        private async Task CheckRoles()
         {
-            throw new NotImplementedException();
+            await _usuarioHelper.CheckRolAsync("Administrador");
+            await _usuarioHelper.CheckRolAsync("Cliente");
         }
 
-        private Task CheckTitularsAsync()
+        private async Task<Usuario> CheckUsuarioAsync(
+            string identificacion,
+            string nombres,
+            string apellidos,
+            string telefono,
+            string direccion,
+            string correo,
+            string estado,
+            string rol)
         {
-            throw new NotImplementedException();
+            var user = await _usuarioHelper.GetUsuarioByEmailAsync(correo);
+            if (user == null)
+            {
+                user = new Usuario
+                {
+                    Nombres = nombres,
+                    Apellidos = apellidos,
+                    Correo = correo,
+                    UserName = correo,
+                    Telefono = telefono,
+                    Direccion = direccion,
+                    Estado = estado,
+                    Identificacion = identificacion
+                };
+
+                await _usuarioHelper.AddUsuarioAsync(user, "123456");
+                await _usuarioHelper.AddUsuarioPorRolAsync(user, rol);
+
+                //var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                //await _userHelper.ConfirmEmailAsync(user, token);
+            }
+
+            return user;
         }
 
-        private Task CheckSonidosAsync()
+        private async Task CheckVideosAsync()
         {
-            throw new NotImplementedException();
+            if (!_dataContext.videos.Any())
+            {
+                var actividad = _dataContext.actividads.FirstOrDefault();
+                AddVideo("LETRA B", actividad, "letraB.mp4", "A");
+                AddVideo("LETRA C", actividad, "letraC.mp4", "A");
+                await _dataContext.SaveChangesAsync();
+            }
         }
 
-        private Task CheckPacientesAsync()
+        private void AddVideo(string nombre, Actividad actividad, string url, string estado)
         {
-            throw new NotImplementedException();
+            _dataContext.videos.Add(new Video
+            {
+                Nombre = nombre,
+                Actividad = actividad,
+                VideoUrl = url,
+                Estado = estado
+            }); ;
         }
 
-        private Task CheckImagensAsync()
+        private async Task CheckTratamientosAsync()
         {
-            throw new NotImplementedException();
+            if (!_dataContext.tratamientos.Any())
+            {
+                var historia = _dataContext.historias.FirstOrDefault();
+                var tipoTratamiento = _dataContext.tipoTratamientos.FirstOrDefault();
+                AddTratamiento("FONEMA B", 10, historia, tipoTratamiento, "REALIZAR 10 TERAPIAS DEL FONEMA B");
+                AddTratamiento("FONEMA C", 10, historia, tipoTratamiento, "REALIZAR 10 TERAPIAS DEL FONEMA C");
+                await _dataContext.SaveChangesAsync();
+            }
+        }
+
+        private void AddTratamiento(
+            string nombre, 
+            int numeroTerapias, 
+            Historia historia, 
+            TipoTratamiento tipoTratamiento, 
+            string detalle)
+        {
+            _dataContext.tratamientos.Add(new Tratamiento
+            {
+                Nombre = nombre,
+                NumeroTerapias = numeroTerapias,
+                Historia = historia,
+                TipoTratamiento = tipoTratamiento,
+                Detalle = detalle
+            }); 
+        }
+
+        private async Task CheckTitularsAsync(Usuario usuario)
+        {
+            if (!_dataContext.titulars.Any())
+            {
+                _dataContext.titulars.Add(new Titular { Usuario = usuario });
+                await _dataContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task CheckSonidosAsync()
+        {
+            if (!_dataContext.sonidos.Any())
+            {
+                var actividad = _dataContext.actividads.FirstOrDefault();
+                AddSonido("LETRA B", actividad, "letraB.mp3", "A");
+                AddSonido("LETRA C", actividad, "letraC.mp3", "A");
+                await _dataContext.SaveChangesAsync();
+            }
+        }
+
+        private void AddSonido(string nombre, Actividad actividad, string url, string estado)
+        {
+            _dataContext.sonidos.Add(new Sonido
+            {
+                Nombre = nombre,
+                Actividad = actividad,
+                SonidoUrl = url,
+                Estado = estado
+            }); ;
+        }
+
+        private async Task CheckPacientesAsync(Usuario usuario)
+        {
+            if (!_dataContext.pacientes.Any())
+            {
+                _dataContext.pacientes.Add(new Paciente { Usuario = usuario });
+                await _dataContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task CheckImagensAsync()
+        {
+            if (!_dataContext.imagens.Any())
+            {
+                var actividad = _dataContext.actividads.FirstOrDefault();
+                AddImagen("MUEVE LABIOS", actividad, "ejeMueveLabio.png", "A");
+                AddImagen("MUEVE BOCA", actividad, "ejeMueveBoca.png", "A");
+                await _dataContext.SaveChangesAsync();
+            }
+        }
+
+        private void AddImagen(string nombre, Actividad actividad, string url, string estado)
+        {
+            _dataContext.imagens.Add(new Imagen
+            {
+                Nombre = nombre,
+                Actividad = actividad,
+                ImagenUrl = url,
+                Estado = estado
+            });
         }
 
 
         private async Task CheckEjerciciosAsync()
         {
-            if (!_context.ejercicios.Any())
+            if (!_dataContext.ejercicios.Any())
             {
-                _context.ejercicios.Add(new Ejercicio { Nombre = "BUCOFACIALES", Detalle = "MOVIMIENTOS DE LAS ARTICULACIONES FACIALES", Estado = "A" });
-                _context.ejercicios.Add(new Ejercicio { Nombre = "RESPIRATORIOS", Detalle = "CONTROLAR LA RESPIRACION", Estado = "A" });
-                await _context.SaveChangesAsync();
+                var tratamiento = _dataContext.tratamientos.FirstOrDefault();
+                AddEjercicio("BUCOFACIALES", "MOVIMIENTOS DE LAS ARTICULACIONES FACIALES", tratamiento, "A");
+                AddEjercicio("RESPIRATORIOS", "CONTROLAR LA RESPIRACION", tratamiento, "A");
+                await _dataContext.SaveChangesAsync();
             }
+            
+        }
+
+        private void AddEjercicio(string nombre, string detalle,Tratamiento tratamiento, string estado)
+        {
+            _dataContext.ejercicios.Add(new Ejercicio
+            {
+                Nombre = nombre,
+                Detalle = detalle,
+                Tratamiento = tratamiento,
+                Estado = estado
+            });
         }
 
         private async Task CheckActividadsAsync()
         {
-            if (!_context.actividads.Any())
+            if (!_dataContext.actividads.Any())
             {
-                _context.actividads.Add(new Actividad { Nombre = "MOVIMIENTOS EXTERNOS DE LA LENGUA", Detalle = "TERAPIA EMPLEADA EN NIÑOS", Estado = "A" });
-                _context.actividads.Add(new Actividad { Nombre = "MOVIMIENTOS INTERNOS DE LA LENGUA", Detalle = "TERAPIA EMPLEADA EN NIÑOS", Estado = "A" });
-                await _context.SaveChangesAsync();
+                var ejercicio = _dataContext.ejercicios.FirstOrDefault();
+                AddActividad("MOVIMIENTOS EXTERNOS DE LA LENGUA", "TERAPIA EMPLEADA EN NIÑOS", ejercicio, "A");
+                AddActividad("MOVIMIENTOS INTERNOS DE LA LENGUA", "TERAPIA EMPLEADA EN NIÑOS", ejercicio, "A");
+                await _dataContext.SaveChangesAsync();
             }
+            
+        }
+
+        private void AddActividad(string nombre, string detalle, Ejercicio ejercicio, string estado)
+        {
+            _dataContext.actividads.Add(new Actividad
+            {
+                Nombre = nombre,
+                Detalle = detalle,
+                Ejercicio = ejercicio,
+                Estado = estado
+            });
         }
 
         private async Task CheckTipoTratamientosAsync()
         {
-            if (!_context.tipoTratamientos.Any())
+            if (!_dataContext.tipoTratamientos.Any())
             {
-                _context.tipoTratamientos.Add(new TipoTratamiento { Nombre = "INDIRECTO" });
-                _context.tipoTratamientos.Add(new TipoTratamiento { Nombre = "DIRECTO" });
-                await _context.SaveChangesAsync();
+                _dataContext.tipoTratamientos.Add(new TipoTratamiento { Nombre = "INDIRECTO" });
+                _dataContext.tipoTratamientos.Add(new TipoTratamiento { Nombre = "DIRECTO" });
+                await _dataContext.SaveChangesAsync();
             }
         }
     }

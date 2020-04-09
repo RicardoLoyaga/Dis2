@@ -29,6 +29,10 @@ namespace Dis2.Web.Data.Entities
         public string Direccion { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [MaxLength(200, ErrorMessage = "El campo {0} no puede tener mas {1} caracteres")]
+        public string Correo { get; set; }
+
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [MaxLength(1, ErrorMessage = "El campo {0} no puede tener mas {1} caracteres")]
         public string Estado { get; set; }
 

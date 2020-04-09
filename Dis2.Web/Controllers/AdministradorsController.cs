@@ -10,22 +10,22 @@ using Dis2.Web.Data.Entities;
 
 namespace Dis2.Web.Controllers
 {
-    public class TitularsController : Controller
+    public class AdministradorsController : Controller
     {
         private readonly DataContext _context;
 
-        public TitularsController(DataContext context)
+        public AdministradorsController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: Titulars
+        // GET: Administradors
         public async Task<IActionResult> Index()
         {
-            return View(await _context.titulars.ToListAsync());
+            return View(await _context.administradors.ToListAsync());
         }
 
-        // GET: Titulars/Details/5
+        // GET: Administradors/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,39 @@ namespace Dis2.Web.Controllers
                 return NotFound();
             }
 
-            var titular = await _context.titulars
+            var administrador = await _context.administradors
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (titular == null)
+            if (administrador == null)
             {
                 return NotFound();
             }
 
-            return View(titular);
+            return View(administrador);
         }
 
-        // GET: Titulars/Create
+        // GET: Administradors/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Titulars/Create
+        // POST: Administradors/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] Titular titular)
+        public async Task<IActionResult> Create([Bind("Id")] Administrador administrador)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(titular);
+                _context.Add(administrador);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(titular);
+            return View(administrador);
         }
 
-        // GET: Titulars/Edit/5
+        // GET: Administradors/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +73,22 @@ namespace Dis2.Web.Controllers
                 return NotFound();
             }
 
-            var titular = await _context.titulars.FindAsync(id);
-            if (titular == null)
+            var administrador = await _context.administradors.FindAsync(id);
+            if (administrador == null)
             {
                 return NotFound();
             }
-            return View(titular);
+            return View(administrador);
         }
 
-        // POST: Titulars/Edit/5
+        // POST: Administradors/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id")] Titular titular)
+        public async Task<IActionResult> Edit(int id, [Bind("Id")] Administrador administrador)
         {
-            if (id != titular.Id)
+            if (id != administrador.Id)
             {
                 return NotFound();
             }
@@ -97,12 +97,12 @@ namespace Dis2.Web.Controllers
             {
                 try
                 {
-                    _context.Update(titular);
+                    _context.Update(administrador);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TitularExists(titular.Id))
+                    if (!AdministradorExists(administrador.Id))
                     {
                         return NotFound();
                     }
@@ -113,10 +113,10 @@ namespace Dis2.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(titular);
+            return View(administrador);
         }
 
-        // GET: Titulars/Delete/5
+        // GET: Administradors/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,30 +124,30 @@ namespace Dis2.Web.Controllers
                 return NotFound();
             }
 
-            var titular = await _context.titulars
+            var administrador = await _context.administradors
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (titular == null)
+            if (administrador == null)
             {
                 return NotFound();
             }
 
-            return View(titular);
+            return View(administrador);
         }
 
-        // POST: Titulars/Delete/5
+        // POST: Administradors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var titular = await _context.titulars.FindAsync(id);
-            _context.titulars.Remove(titular);
+            var administrador = await _context.administradors.FindAsync(id);
+            _context.administradors.Remove(administrador);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TitularExists(int id)
+        private bool AdministradorExists(int id)
         {
-            return _context.titulars.Any(e => e.Id == id);
+            return _context.administradors.Any(e => e.Id == id);
         }
     }
 }
