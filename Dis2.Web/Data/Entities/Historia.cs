@@ -14,6 +14,7 @@ namespace Dis2.Web.Data.Entities
         [MaxLength(100, ErrorMessage = "El campo {0} no puede tener mas {1} caracteres")]
         public string Descripcion { get; set; }
 
+        [Display(Name = "Fecha")]
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
@@ -21,8 +22,10 @@ namespace Dis2.Web.Data.Entities
 
         public string Detalle { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
-        public DateTime DateLocal => DateLocal.ToLocalTime();
+        [Display(Name = "Fecha")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
+        public DateTime FechaLocal => Fecha.ToLocalTime();
 
         public Paciente Paciente { get; set; }
 
