@@ -7,31 +7,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dis2.Web.Data;
 using Dis2.Web.Data.Entities;
-using Dis2.Web.Models;
 using Dis2.Web.Helpers;
+using Dis2.Web.Models;
 
 namespace Dis2.Web.Controllers
 {
-    public class TitularsController : Controller
+    public class PacientesController : Controller
     {
         private readonly DataContext _context;
         private readonly IUsuarioHelper _usuarioHelper;
 
-        public TitularsController(DataContext context, IUsuarioHelper usuarioHelper)
+        public PacientesController(DataContext context, IUsuarioHelper usuarioHelper)
         {
             _context = context;
             _usuarioHelper = usuarioHelper;
         }
 
-        // GET: Titulars
+        // GET: Pacientes
         public IActionResult Index()
         {
-            return View(_context.titulars
-                .Include(t => t.Usuario)
-                .Include(t => t.Pacientes));
+            return View(_context.pacientes
+                .Include(p => p.Titular)
+                .Include(p => p.Historias));
         }
 
-        // GET: Titulars/Details/5
+        // GET: Pacientes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,20 +39,22 @@ namespace Dis2.Web.Controllers
                 return NotFound();
             }
 
-            var titular = await _context.titulars
-                .Include(t => t.Usuario)
-                .Include(t => t.Pacientes)
-                .ThenInclude(p => p.Historias)
+            var paciente = await _context.pacientes
+                .Include(p => p.Titular)
+                .Include(p => p.Historias)
+                .ThenInclude(h => h.Especialista)
+                .Include(p => p.Titular)
+                .ThenInclude(t => t.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (titular == null)
+            if (paciente == null)
             {
                 return NotFound();
             }
 
-            return View(titular);
+            return View(paciente);
         }
 
-        // GET: Titulars/Create
+        // GET: Pacientes/Create
         public IActionResult Create()
         {
             return View();
@@ -64,7 +66,7 @@ namespace Dis2.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var usuario = new Usuario 
+                var usuario = new Usuario
                 {
                     Direccion = model.Direccion,
                     Identificacion = model.Identificacion,
@@ -73,6 +75,7 @@ namespace Dis2.Web.Controllers
                     Email = model.Username,
                     PhoneNumber = model.PhoneNumber,
                     Estado = model.Estado,
+                    FechaNacimiento = model.FechaNacimientoLocal,
                     UserName = model.Username
                 };
 
@@ -82,25 +85,23 @@ namespace Dis2.Web.Controllers
                     var usuarioDB = await _usuarioHelper.GetUsuarioByEmailAsync(model.Username);
                     await _usuarioHelper.AddUsuarioPorRolAsync(usuarioDB, "Cliente");
 
-                    var titular = new Titular
+                    var paciente = new Paciente
                     {
-                        Pacientes = new List<Paciente>(),
+                        Historias = new List<Historia>(),
                         Usuario = usuarioDB
                     };
 
-                    _context.titulars.Add(titular);
+                    _context.pacientes.Add(paciente);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
 
                 ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description);
-                
             }
-
             return View(model);
         }
 
-        // GET: Titulars/Edit/5
+        // GET: Pacientes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -108,22 +109,22 @@ namespace Dis2.Web.Controllers
                 return NotFound();
             }
 
-            var titular = await _context.titulars.FindAsync(id);
-            if (titular == null)
+            var paciente = await _context.pacientes.FindAsync(id);
+            if (paciente == null)
             {
                 return NotFound();
             }
-            return View(titular);
+            return View(paciente);
         }
 
-        // POST: Titulars/Edit/5
+        // POST: Pacientes/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id")] Titular titular)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FechaNacimiento")] Paciente paciente)
         {
-            if (id != titular.Id)
+            if (id != paciente.Id)
             {
                 return NotFound();
             }
@@ -132,12 +133,12 @@ namespace Dis2.Web.Controllers
             {
                 try
                 {
-                    _context.Update(titular);
+                    _context.Update(paciente);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TitularExists(titular.Id))
+                    if (!PacienteExists(paciente.Id))
                     {
                         return NotFound();
                     }
@@ -148,10 +149,10 @@ namespace Dis2.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(titular);
+            return View(paciente);
         }
 
-        // GET: Titulars/Delete/5
+        // GET: Pacientes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -159,30 +160,30 @@ namespace Dis2.Web.Controllers
                 return NotFound();
             }
 
-            var titular = await _context.titulars
+            var paciente = await _context.pacientes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (titular == null)
+            if (paciente == null)
             {
                 return NotFound();
             }
 
-            return View(titular);
+            return View(paciente);
         }
 
-        // POST: Titulars/Delete/5
+        // POST: Pacientes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var titular = await _context.titulars.FindAsync(id);
-            _context.titulars.Remove(titular);
+            var paciente = await _context.pacientes.FindAsync(id);
+            _context.pacientes.Remove(paciente);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TitularExists(int id)
+        private bool PacienteExists(int id)
         {
-            return _context.titulars.Any(e => e.Id == id);
+            return _context.pacientes.Any(e => e.Id == id);
         }
     }
 }

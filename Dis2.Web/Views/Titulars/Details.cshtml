@@ -4,15 +4,107 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
+<h2>Detalles</h2>
 
 <div>
     <h4>Titular</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Usuario.Identificacion)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Usuario.Identificacion)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Usuario.Nombres)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Usuario.Nombres)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Usuario.Apellidos)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Usuario.Apellidos)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Usuario.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Usuario.Email)
+        </dd>
+        <dt>
+            Telefono
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Usuario.PhoneNumber)
+        </dd>
+        <dt>
+            Numero Pacientes
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Pacientes.Count)
+        </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+    <a asp-action="AddPaciente" asp-route-id="@Model.Id" class="btn btn-success">Agregar Paciente</a>
+    <a asp-action="Index" class="btn btn-primary">Regresar</a>
 </div>
+@if (Model.Pacientes.Count == 0)
+{
+    <h4>No hay pacientes agregados</h4>
+}
+else
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Usuario.Identificacion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usuario.Nombres)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usuario.Apellidos)
+            </th>
+            <th>
+                Fecha de Nacimiento
+            </th>
+            <th>
+                Historias
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Pacientes)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Usuario.Identificacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Usuario.Nombres)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Usuario.Apellidos)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Usuario.FechaNacimientoLocal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Historias.Count)
+            </td>
+            <td>
+                <a asp-action="EditPaciente" asp-route-id="@item.Id" class="btn btn-warning">Editar</a> |
+                <a asp-action="DetailsPaciente" asp-route-id="@item.Id" class="btn btn-info">Detalles</a> |
+                <a asp-action="DeletePaciente" asp-route-id="@item.Id" class="btn btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+}

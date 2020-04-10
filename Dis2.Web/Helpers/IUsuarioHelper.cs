@@ -1,4 +1,5 @@
 ﻿using Dis2.Web.Data.Entities;
+using Dis2.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -14,5 +15,7 @@ namespace Dis2.Web.Helpers
         Task CheckRolAsync(string nombreRol);
         Task AddUsuarioPorRolAsync(Usuario usuario, string nombreRol);
         Task<bool> IsUsuarioInRolAsync(Usuario usuario, string nombreRol);
+        Task<SignInResult> LoginAsync(LoginViewModel model);
+        Task LogoutAsync();
     }
 }

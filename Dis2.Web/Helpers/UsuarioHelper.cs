@@ -1,4 +1,5 @@
 ﻿using Dis2.Web.Data.Entities;
+using Dis2.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,16 +12,18 @@ namespace Dis2.Web.Helpers
     {
         private readonly UserManager<Usuario> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<Usuario> _signInManager;
 
         public UsuarioHelper(
             UserManager<Usuario> userManager,
-            RoleManager<IdentityRole> roleManager
-            )
+            RoleManager<IdentityRole> roleManager,
+            SignInManager<Usuario> signInManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _signInManager = signInManager;
         }
-
+         
         public async Task<IdentityResult> AddUsuarioAsync(Usuario usuario, string contrasena)
         {
             return await _userManager.CreateAsync(usuario, contrasena);
@@ -51,6 +54,20 @@ namespace Dis2.Web.Helpers
         public async Task<bool> IsUsuarioInRolAsync(Usuario usuario, string nombreRol)
         {
             return await _userManager.IsInRoleAsync(usuario, nombreRol);
+        }
+
+        public async Task<SignInResult> LoginAsync(LoginViewModel model)
+        {
+            return await _signInManager.PasswordSignInAsync(
+                model.Usuario,
+                model.Contrasena,
+                model.Recordar,
+                false);
+        }
+
+        public async Task LogoutAsync()
+        {
+            await _signInManager.SignOutAsync();
         }
     }
 }

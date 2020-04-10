@@ -24,8 +24,8 @@ namespace Dis2.Web.Data
         {
             await _dataContext.Database.EnsureCreatedAsync();
             await CheckRoles();
-            var administrador = await CheckUsuarioAsync("1721515680", "BRYAN RICARDO", "ARMAS LOYAGA", "0996903086", "EL CONDE", "bral_9210@hotmail.com", "A", "Administrador");
-            var cliente = await CheckUsuarioAsync("1723620348", "ERIKA ANNABELL", "MONTESDEOCA CARGUA", "0996907141", "EL CONDE", "erika_annabell@hotmail.com", "A", "Cliente");
+            var administrador = await CheckUsuarioAsync("1721515680", "BRYAN RICARDO", "ARMAS LOYAGA", "0996903086", "EL CONDE", "bral_9210@hotmail.com", "A", "1992/11/01" ,"Administrador");
+            var cliente = await CheckUsuarioAsync("1723620348", "ERIKA ANNABELL", "MONTESDEOCA CARGUA", "0996907141", "EL CONDE", "erika_annabell@hotmail.com", "A", "1994/02/02", "Cliente");
             await CheckTipoTratamientosAsync();
             await CheckActividadsAsync();
             await CheckEjerciciosAsync();
@@ -62,6 +62,7 @@ namespace Dis2.Web.Data
             string direccion,
             string correo,
             string estado,
+            string fechaNacimiento,
             string rol)
         {
             var user = await _usuarioHelper.GetUsuarioByEmailAsync(correo);
@@ -71,11 +72,12 @@ namespace Dis2.Web.Data
                 {
                     Nombres = nombres,
                     Apellidos = apellidos,
-                    Correo = correo,
+                    Email = correo,
                     UserName = correo,
-                    Telefono = telefono,
+                    PhoneNumber = telefono,
                     Direccion = direccion,
                     Estado = estado,
+                    FechaNacimiento = DateTime.Parse(fechaNacimiento),
                     Identificacion = identificacion
                 };
 

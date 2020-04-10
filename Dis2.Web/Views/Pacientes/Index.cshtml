@@ -1,13 +1,13 @@
-﻿@model IEnumerable<Dis2.Web.Data.Entities.Titular>
+﻿@model IEnumerable<Dis2.Web.Data.Entities.Paciente>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Titulares</h2>
+<h2>Pacientes</h2>
 
 <p>
-    <a asp-action="Create" class="btn btn-success">Agregar Titular</a>
+    <a asp-action="Create" class="btn btn-success">Agregar Paciente</a>
 </p>
 <table class="table">
     <thead>
@@ -25,10 +25,7 @@
                 @Html.DisplayNameFor(model => model.Usuario.Email)
             </th>
             <th>
-                Telefono
-            </th>
-            <th>
-                Numero de Pacientes
+                Historia
             </th>
         </tr>
     </thead>
@@ -48,10 +45,7 @@
                 @Html.DisplayFor(modelItem => item.Usuario.Email)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Usuario.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Pacientes.Count)
+                @Html.DisplayFor(modelItem => item.Historias.Count)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Editar</a> |

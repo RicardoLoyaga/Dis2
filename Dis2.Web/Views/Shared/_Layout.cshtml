@@ -34,8 +34,21 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     <li><a asp-area="" asp-controller="Titulars" asp-action="Index">Titulares</a></li>
+                    <li><a asp-area="" asp-controller="Pacientes" asp-action="Index">Paciente</a></li>
                     <li><a asp-area="" asp-controller="Administradors" asp-action="Index">Administradores</a></li>
                     <li><a asp-area="" asp-controller="Historias" asp-action="Index">Historias</a></li>
+                    <li><a asp-area="" asp-controller="TipoTratamientoes" asp-action="Index">Tipo Tratamiento</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><a asp-area="" asp-controller="Account" asp-action="ChangeUser">@User.Identity.Name</a></li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Logout">Cerrar Sesion</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-area="" asp-controller="Account" asp-action="Login">Iniciar Sesion</a></li>
+                    }
                 </ul>
             </div>
         </div>
